@@ -5,7 +5,7 @@ import {
 	Ref,
 	Props,
 	ReactElement,
-	ElementType
+	ElementType,
 } from 'shared/ReactTypes';
 const ReactElement = (
 	type: Type,
@@ -19,7 +19,7 @@ const ReactElement = (
 		key,
 		ref,
 		props,
-		__mark: 'chin'
+		__mark: 'chin',
 	};
 	return element;
 };

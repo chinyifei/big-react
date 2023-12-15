@@ -1,14 +1,36 @@
 import { beginWork } from './beginWork';
 import { completeWork } from './completeWork';
-import { FiberNode } from './fiber';
+import { FiberNode, FiberRootNode, createWorkInProgress } from './fiber';
+import { HostRoot } from './workTag';
 
 let workInprogress: FiberNode | null = null;
 
-function prepareFreshStack(fiber: FiberNode) {
-	workInprogress = fiber;
+function prepareFreshStack(fiber: FiberRootNode) {
+	workInprogress = createWorkInProgress(fiber.current, {});
 }
 
-function renderRoot(root: FiberNode) {
+//连接rendeRoot和updateQueue
+export function scheduleUpdateOnFiber(fiber: FiberNode) {
+	// TODO 调度功能
+	//fiber root node
+	const root = markUpdateFromFiberToRoot(fiber);
+	renderRoot(root);
+}
+
+function markUpdateFromFiberToRoot(fiber: FiberNode) {
+	let node = fiber;
+	let parent = fiber.return;
+	while (parent !== null) {
+		node = parent;
+		parent = parent.return;
+	}
+	if (node.tag === HostRoot) {
+		return node.stateNode;
+	}
+	return null;
+}
+
+function renderRoot(root: FiberRootNode) {
 	//init
 	prepareFreshStack(root);
 
@@ -31,7 +53,7 @@ function workLoop() {
 
 const PerformUnitOfWork = (fiber: FiberNode) => {
 	const next = beginWork();
-	fiber.memorizeState = fiber.pendingProps;
+	fiber.memorizedState = fiber.pendingProps;
 	if (next === null) {
 		/**如果没有子节点,遍历兄弟节点 */
 		completeUnitOfWork(fiber);

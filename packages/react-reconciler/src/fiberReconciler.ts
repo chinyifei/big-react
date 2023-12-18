@@ -30,6 +30,7 @@ export function updateContainer(
 		hostRootFiber.updateQueue as UpdateQueue<ReactElementType | null>,
 		update
 	);
+	//开始调度
 	scheduleUpdateOnFiber(hostRootFiber);
 	return element;
 }

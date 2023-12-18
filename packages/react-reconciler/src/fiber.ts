@@ -1,10 +1,13 @@
-import { Props, Key } from 'shared/ReactTypes';
-import { WorkTag } from './workTag';
+import { Props, Key, ReactElementType } from 'shared/ReactTypes';
+import { FunctionCompent, HostCompent, WorkTag } from './workTag';
 import { Flags, NoFlags } from './fiberFlags';
 import { Container } from 'hostConfig';
 
 export class FiberNode {
+	/** 对于 FunctionComponent，指函数本身，对于ClassComponent，指class，
+	 * 对于HostComponent，指DOM节点tagName */
 	type: any;
+	/**Fiber对应组件的类型 Function/Class/Host... */
 	tag: WorkTag;
 	pendingProps: Props;
 	key: Key;
@@ -19,11 +22,14 @@ export class FiberNode {
 	flags: Flags;
 	updateQueue: unknown;
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
+		// 作为静态数据结构的属性
 		this.tag = tag;
 		// this.pendingProps = pendingProps;
 		this.key = key;
 		this.stateNode = null;
 		this.type = null;
+		// // 大部分情况同type，某些情况不同，比如FunctionComponent使用React.memo包裹
+		// this.elementType = null;
 		/**构成树状结构 */
 		//指向父fiberbode
 		this.return = null;
@@ -33,6 +39,7 @@ export class FiberNode {
 		this.index = 0;
 
 		/**作为工作单元 */
+		// 保存本次更新造成的状态改变相关信息
 		this.pendingProps = pendingProps; //开始工作之前的props
 		this.memorizedProps = null; //工作完成之后的props
 		this.memorizedState = null;
@@ -81,3 +88,17 @@ export const createWorkInProgress = (
 	wip.memorizedState = current.memorizedState;
 	return wip;
 };
+
+export function createFiberFromElement(element: ReactElementType): FiberNode {
+	const { props, key, type } = element;
+	let fiberTag: WorkTag = FunctionCompent;
+	if (type === 'string') {
+		//<div></div> type:div
+		fiberTag = HostCompent;
+	} else if (type !== 'function' && __DEV__) {
+		console.warn('未定义的type类型', element);
+	}
+	const fiber = new FiberNode(fiberTag, props, key);
+	fiber.type = type;
+	return fiber;
+}

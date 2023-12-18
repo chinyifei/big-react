@@ -9,28 +9,28 @@ export type UpdateQueue<state> = {
 		pending: Update<state> | null;
 	};
 };
-
+//创建数据结构update
 export const createUpdate = <state>(action: Action<state>): Update<state> => {
 	return {
 		action,
 	};
 };
-
-export const createUpdateQueue = <Action>(): UpdateQueue<Action> => {
+//保存update的数据结构
+export const createUpdateQueue = <State>(): UpdateQueue<State> => {
 	return {
 		shared: {
 			pending: null,
 		},
-	} as UpdateQueue<Action>;
+	} as UpdateQueue<State>;
 };
-
-export const enqueueUpdate = <Action>(
-	updateQueue: UpdateQueue<Action>,
-	update: Update<Action>
+//Update插入UpdateQueue中
+export const enqueueUpdate = <State>(
+	updateQueue: UpdateQueue<State>,
+	update: Update<State>
 ) => {
 	updateQueue.shared.pending = update;
 };
-
+//消费update
 export const processUpdateQueue = <State>(
 	baseState: State,
 	pendingUpdate: Update<State> | null

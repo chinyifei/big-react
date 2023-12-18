@@ -45,6 +45,10 @@ function renderRoot(root: FiberRootNode) {
 			}
 		}
 	} while (true);
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+	//根据wip以及树中的Flags执行具体的DOM操作
+	// commitRoot(root);
 }
 /**整个更新流程就是一个递归的过程,递:beginWork归:completeWork */
 function workLoop() {
@@ -54,7 +58,7 @@ function workLoop() {
 }
 
 const PerformUnitOfWork = (fiber: FiberNode) => {
-	const next = beginWork();
+	const next = beginWork(fiber);
 	fiber.memorizedState = fiber.pendingProps;
 	if (next === null) {
 		/**如果没有子节点,遍历兄弟节点 */
@@ -67,7 +71,7 @@ const PerformUnitOfWork = (fiber: FiberNode) => {
 const completeUnitOfWork = (fiber: FiberNode) => {
 	let node: FiberNode | null = fiber;
 	do {
-		completeWork();
+		completeWork(fiber);
 		if (node.sibling !== null) {
 			workInprogress = node.sibling;
 			//归

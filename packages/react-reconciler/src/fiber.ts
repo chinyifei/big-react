@@ -20,6 +20,7 @@ export class FiberNode {
 	memorizedState: any;
 	alternate: FiberNode | null;
 	flags: Flags;
+	subtreeFlags: Flags;
 	updateQueue: unknown;
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 作为静态数据结构的属性
@@ -47,6 +48,7 @@ export class FiberNode {
 		this.updateQueue = null;
 		//副作用
 		this.flags = NoFlags;
+		this.subtreeFlags = NoFlags;
 	}
 }
 
@@ -79,6 +81,7 @@ export const createWorkInProgress = (
 		wip.pendingProps = current.pendingProps;
 		//清楚上一次的副作用
 		wip.flags = NoFlags;
+		wip.subtreeFlags = NoFlags;
 	}
 	wip.type = current.type;
 	//updateQueue的数据结构设计就是为了现在两颗fiber树能公用一个updateQueue

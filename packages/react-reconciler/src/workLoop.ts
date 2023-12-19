@@ -1,6 +1,7 @@
 import { beginWork } from './beginWork';
 import { completeWork } from './completeWork';
 import { FiberNode, FiberRootNode, createWorkInProgress } from './fiber';
+import { MutationMask, NoFlags } from './fiberFlags';
 import { HostRoot } from './workTag';
 
 let workInprogress: FiberNode | null = null;
@@ -48,8 +49,39 @@ function renderRoot(root: FiberRootNode) {
 	const finishedWork = root.current.alternate;
 	root.finishedWork = finishedWork;
 	//根据wip以及树中的Flags执行具体的DOM操作
-	// commitRoot(root);
+	commitRoot(root);
 }
+/**commit阶段 */
+function commitRoot(root: FiberRootNode) {
+	const finishedWork = root.finishedWork;
+	if (finishedWork === null) {
+		//commit阶段不存在task
+		return;
+	}
+	if (__DEV__) {
+		console.warn('commit阶段开始', finishedWork);
+	}
+	//重置
+	root.finishedWork = null;
+	//判断root本身的Flags和subtreeFlags
+	const subtreeHasEffect =
+		(finishedWork.subtreeFlags & MutationMask) !== NoFlags;
+	const rootHasEffect = (finishedWork.flags & MutationMask) !== NoFlags;
+	/**判断是否存在三个子阶段需要执行的操作 */
+	if (subtreeHasEffect || rootHasEffect) {
+		//   beforeMutation阶段
+		// mutation阶段 Placement
+		/**在layout开始之前,mutation结束之后,切换current fiber树
+		 *root.current指向当前fiber-->current
+     finishedWork指向workInProgress --> wip fiber树
+		 */
+		root.current = finishedWork;
+		// layout阶段
+	} else {
+		root.current = finishedWork;
+	}
+}
+
 /**整个更新流程就是一个递归的过程,递:beginWork归:completeWork */
 function workLoop() {
 	while (workInprogress !== null) {
@@ -71,7 +103,7 @@ const PerformUnitOfWork = (fiber: FiberNode) => {
 const completeUnitOfWork = (fiber: FiberNode) => {
 	let node: FiberNode | null = fiber;
 	do {
-		completeWork(fiber);
+		completeWork(node);
 		if (node.sibling !== null) {
 			workInprogress = node.sibling;
 			//归

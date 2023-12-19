@@ -55,7 +55,8 @@ export class FiberNode {
 export class FiberRootNode {
 	container: Container;
 	current: FiberNode;
-	finishedWork: FiberNode | null; //指向我们更新完成之后的hostRootFiber
+	/**指向我们更新完成之后的hostRootFiber */
+	finishedWork: FiberNode | null;
 	constructor(container: any, hostFiber: FiberNode) {
 		this.container = container;
 		this.current = hostFiber;

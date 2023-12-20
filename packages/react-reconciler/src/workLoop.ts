@@ -1,4 +1,5 @@
 import { beginWork } from './beginWork';
+import { commitMutationEffect } from './commitWork';
 import { completeWork } from './completeWork';
 import { FiberNode, FiberRootNode, createWorkInProgress } from './fiber';
 import { MutationMask, NoFlags } from './fiberFlags';
@@ -71,6 +72,7 @@ function commitRoot(root: FiberRootNode) {
 	if (subtreeHasEffect || rootHasEffect) {
 		//   beforeMutation阶段
 		// mutation阶段 Placement
+		commitMutationEffect(finishedWork);
 		/**在layout开始之前,mutation结束之后,切换current fiber树
 		 *root.current指向当前fiber-->current
      finishedWork指向workInProgress --> wip fiber树

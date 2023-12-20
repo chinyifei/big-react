@@ -24,6 +24,7 @@ const resolvePkgPath = (pkgName, isDist) => {
 const getBaseRollupPlugins = ({
 	alias = {
 		__DEV__: true,
+		preventAssigment: true,
 	},
 	typescript = {},
 } = {}) => {

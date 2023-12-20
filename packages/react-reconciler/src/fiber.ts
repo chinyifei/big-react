@@ -11,6 +11,7 @@ export class FiberNode {
 	tag: WorkTag;
 	pendingProps: Props;
 	key: Key;
+	/**指向真实DOM */
 	stateNode: any;
 	return: FiberNode | null;
 	sibling: FiberNode | null;

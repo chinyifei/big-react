@@ -1,9 +1,9 @@
 import { Container, appendChildToContainer } from 'hostConfig';
 import { FiberNode, FiberRootNode } from './fiber';
 import { MutationMask, NoFlags, Placement } from './fiberFlags';
-import { HostCompent, HostRoot, HostText } from './workTag';
+import { HostComponent, HostRoot, HostText } from './workTags';
 let nextEffect: FiberNode | null = null;
-export function commitMutationEffect(finishedWork: FiberNode) {
+export function commitMutationEffects(finishedWork: FiberNode) {
 	nextEffect = finishedWork;
 	while (nextEffect !== null) {
 		//向下遍历
@@ -62,7 +62,7 @@ function getHostParent(fiber: FiberNode): Container | null {
 		if (parent.tag === HostRoot) {
 			return (parent.stateNode as FiberRootNode).container;
 		}
-		if (parent.tag === HostCompent) {
+		if (parent.tag === HostComponent) {
 			return parent.stateNode as Container;
 		}
 		parent = parent.return;
@@ -78,7 +78,7 @@ function appendPlacementNodeIntoContainer(
 	hostParent: Container
 ) {
 	// fiber host
-	if (finishedWork.tag === HostCompent || finishedWork.tag === HostText) {
+	if (finishedWork.tag === HostComponent || finishedWork.tag === HostText) {
 		appendChildToContainer(hostParent, finishedWork.stateNode);
 		return;
 	}

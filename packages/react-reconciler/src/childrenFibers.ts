@@ -1,6 +1,6 @@
 import { ReactElementType } from 'shared/ReactTypes';
 import { FiberNode, createFiberFromElement } from './fiber';
-import { HostText } from './workTag';
+import { HostText } from './workTags';
 import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
 import { Placement } from './fiberFlags';
 
@@ -10,7 +10,7 @@ import { Placement } from './fiberFlags';
  * @param shouldTrackEffects  是否追踪副作用
  * @param wip
  */
-function childReconcler(shouldTrackEffects: boolean, wip?: FiberNode) {
+function childReconciler(shouldTrackEffects: boolean, wip?: FiberNode) {
 	function reconcileSingleElement(
 		returnFiber: FiberNode,
 		currentFiber: FiberNode | null,
@@ -52,7 +52,7 @@ function childReconcler(shouldTrackEffects: boolean, wip?: FiberNode) {
 					);
 				default:
 					if (__DEV__) {
-						console.warn('未实现的类型', newChild);
+						console.warn('未实现的reconcile类型', newChild);
 					}
 					break;
 			}
@@ -65,9 +65,12 @@ function childReconcler(shouldTrackEffects: boolean, wip?: FiberNode) {
 				reconcileSingleTextNode(returnFiber, currentFiber, newChild)
 			);
 		}
+		if (__DEV__) {
+			console.warn('未实现的reconcile类型', newChild);
+		}
 		return null;
 	};
 }
 
-export const reconcileChildFibers = childReconcler(true);
-export const mountChildFibers = childReconcler(false);
+export const reconcileChildFibers = childReconciler(true);
+export const mountChildFibers = childReconciler(false);

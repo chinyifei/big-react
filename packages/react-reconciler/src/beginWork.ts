@@ -3,7 +3,7 @@
 import { ReactElementType } from 'shared/ReactTypes';
 import { FiberNode } from './fiber';
 import { UpdateQueue, processUpdateQueue } from './updateQueue';
-import { HostCompent, HostRoot, HostText } from './workTag';
+import { HostComponent, HostRoot, HostText } from './workTags';
 import { mountChildFibers, reconcileChildFibers } from './childrenFibers';
 
 /**
@@ -14,9 +14,9 @@ import { mountChildFibers, reconcileChildFibers } from './childrenFibers';
 export const beginWork = (wip: FiberNode) => {
 	// 比较,然后返回子fiberNode
 	switch (wip.tag) {
-		case HostCompent:
-			return updateHostRoot(wip);
 		case HostRoot:
+			return updateHostRoot(wip);
+		case HostComponent:
 			return updateHostComponent(wip);
 		/**HostText没有子节点 返回null,归 */
 		case HostText:
@@ -25,25 +25,27 @@ export const beginWork = (wip: FiberNode) => {
 			if (__DEV__) {
 				console.warn('beginWork未实现的类型');
 			}
-			return null;
+			break;
 	}
+	return null;
 };
 
 function updateHostRoot(wip: FiberNode) {
-	const baseState = wip.memorizedState;
+	const baseState = wip.memoizedState;
 	const updateQueue = wip.updateQueue as UpdateQueue<Element>;
 	const pending = updateQueue.shared.pending;
 	//执行完清楚副作用
 	updateQueue.shared.pending = null;
-	const { memorizedState } = processUpdateQueue(baseState, pending);
-	wip.memorizedState = memorizedState;
+	const { memoizedState } = processUpdateQueue(baseState, pending);
+	wip.memoizedState = memoizedState;
 
 	/**通过对比子 current fiberNode与子 reactElement，生成子对应wip fiberNode */
 	//子reactelement
-	const nextChildren = wip.memorizedState;
+	const nextChildren = wip.memoizedState;
 
 	// 子current fiberNode =  wip.alternate?.child;
-	reconcileChildFibers(nextChildren, wip);
+	// reconcileChildFibers(nextChildren, wip);
+	reconcileChildren(wip, nextChildren);
 	return wip.child;
 }
 
@@ -72,5 +74,5 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
 		wip.child = mountChildFibers(wip, null, children);
 	}
 	// reconcileChildFibers(wip, current?.child, children);
-	return wip.child;
+	// return wip.child;
 }

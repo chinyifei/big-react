@@ -2,7 +2,7 @@
 
 import { Container } from 'hostConfig';
 import { FiberNode, FiberRootNode } from './fiber';
-import { HostRoot } from './workTag';
+import { HostRoot } from './workTags';
 import {
 	UpdateQueue,
 	createUpdate,

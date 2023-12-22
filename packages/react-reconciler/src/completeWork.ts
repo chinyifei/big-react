@@ -4,7 +4,7 @@ import {
 	createTextInstance,
 } from 'hostConfig';
 import { FiberNode } from './fiber';
-import { HostCompent, HostRoot, HostText } from './workTag';
+import { HostComponent, HostRoot, HostText } from './workTags';
 import { NoFlags } from './fiberFlags';
 
 //递归中归阶段
@@ -12,7 +12,7 @@ export const completeWork = (wip: FiberNode) => {
 	const newProps = wip.pendingProps;
 	const current = wip.alternate;
 	switch (wip.tag) {
-		case HostCompent:
+		case HostComponent:
 			if (current !== null && wip.stateNode) {
 				//update wip.stateNode -->dom节点
 			} else {
@@ -50,7 +50,7 @@ function appendAllChildren(parent: Element, wip: FiberNode) {
 	let node = wip.child;
 
 	while (node !== null) {
-		if (node.tag === HostCompent || node.tag === HostText) {
+		if (node.tag === HostComponent || node.tag === HostText) {
 			appendInitialChild(parent, node?.stateNode);
 		} else if (node.child !== null) {
 			node.child.return = node;

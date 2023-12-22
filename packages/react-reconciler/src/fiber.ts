@@ -1,5 +1,5 @@
 import { Props, Key, ReactElementType } from 'shared/ReactTypes';
-import { FunctionCompent, HostCompent, WorkTag } from './workTag';
+import { FunctionComponent, HostComponent, WorkTag } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
 import { Container } from 'hostConfig';
 
@@ -17,8 +17,8 @@ export class FiberNode {
 	sibling: FiberNode | null;
 	child: FiberNode | null;
 	index: number;
-	memorizedProps: Props | null;
-	memorizedState: any;
+	memoizedProps: Props | null;
+	memoizedState: any;
 	alternate: FiberNode | null;
 	flags: Flags;
 	subtreeFlags: Flags;
@@ -43,8 +43,8 @@ export class FiberNode {
 		/**作为工作单元 */
 		// 保存本次更新造成的状态改变相关信息
 		this.pendingProps = pendingProps; //开始工作之前的props
-		this.memorizedProps = null; //工作完成之后的props
-		this.memorizedState = null;
+		this.memoizedProps = null; //工作完成之后的props
+		this.memoizedState = null;
 		this.alternate = null;
 		this.updateQueue = null;
 		//副作用
@@ -58,9 +58,10 @@ export class FiberRootNode {
 	current: FiberNode;
 	/**指向我们更新完成之后的hostRootFiber */
 	finishedWork: FiberNode | null;
-	constructor(container: any, hostFiber: FiberNode) {
+	constructor(container: any, hostRootFiber: FiberNode) {
 		this.container = container;
-		this.current = hostFiber;
+		this.current = hostRootFiber;
+		hostRootFiber.stateNode = this;
 		this.finishedWork = null;
 	}
 }
@@ -89,17 +90,17 @@ export const createWorkInProgress = (
 	//updateQueue的数据结构设计就是为了现在两颗fiber树能公用一个updateQueue
 	wip.updateQueue = current.updateQueue;
 	wip.child = current.child;
-	wip.memorizedProps = current.memorizedProps;
-	wip.memorizedState = current.memorizedState;
+	wip.memoizedProps = current.memoizedProps;
+	wip.memoizedState = current.memoizedState;
 	return wip;
 };
 
 export function createFiberFromElement(element: ReactElementType): FiberNode {
 	const { props, key, type } = element;
-	let fiberTag: WorkTag = FunctionCompent;
-	if (type === 'string') {
+	let fiberTag: WorkTag = FunctionComponent;
+	if (typeof type === 'string') {
 		//<div></div> type:div
-		fiberTag = HostCompent;
+		fiberTag = HostComponent;
 	} else if (type !== 'function' && __DEV__) {
 		console.warn('未定义的type类型', element);
 	}

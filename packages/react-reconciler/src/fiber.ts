@@ -9,19 +9,35 @@ export class FiberNode {
 	type: any;
 	/**Fiber对应组件的类型 Function/Class/Host... */
 	tag: WorkTag;
-	pendingProps: Props;
 	key: Key;
-	/**指向真实DOM */
+	/**Fiber对应的真实DOM节点 */
 	stateNode: any;
+	/**父FiberNode */
 	return: FiberNode | null;
+	/**兄弟FiberNode */
 	sibling: FiberNode | null;
+	/**子FiberNode */
 	child: FiberNode | null;
+	/**表示同级FiberNode第几个li ul>li*3 */
 	index: number;
+	/**开始工作之前的props */
+	pendingProps: Props;
+	/**工作完成之后的props */
 	memoizedProps: Props | null;
+	/**保存上一次工作的state(暂定jsx 或者是返回jsx的函数) */
 	memoizedState: any;
+	/**指向该FiberNode在另一次更新时对应的FiberNode  */
 	alternate: FiberNode | null;
+	/**副作用标记 例如placement,deletion,update */
 	flags: Flags;
 	subtreeFlags: Flags;
+	/**保存UpdateQueue的数据结构
+ * {
+		shared: {
+			pending: null,
+		},
+	}
+*/
 	updateQueue: unknown;
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 作为静态数据结构的属性
@@ -41,9 +57,9 @@ export class FiberNode {
 		this.index = 0;
 
 		/**作为工作单元 */
-		// 保存本次更新造成的状态改变相关信息
-		this.pendingProps = pendingProps; //开始工作之前的props
-		this.memoizedProps = null; //工作完成之后的props
+		/** 保存本次更新造成的状态改变相关信息*/
+		this.pendingProps = pendingProps;
+		this.memoizedProps = null;
 		this.memoizedState = null;
 		this.alternate = null;
 		this.updateQueue = null;
@@ -54,7 +70,9 @@ export class FiberNode {
 }
 
 export class FiberRootNode {
+	/**保存宿主环境挂在的节点 */
 	container: Container;
+	/**指向我们的hostRootFiber */
 	current: FiberNode;
 	/**指向我们更新完成之后的hostRootFiber */
 	finishedWork: FiberNode | null;
@@ -65,13 +83,13 @@ export class FiberRootNode {
 		this.finishedWork = null;
 	}
 }
-
+/**获取当前FiberNode与之对应的另外一FiberNode(alternate) */
 export const createWorkInProgress = (
 	current: FiberNode,
 	pendingProps: Props
 ) => {
 	let wip = current.alternate;
-
+	/**是否是首屏渲染 */
 	if (wip === null) {
 		//mount
 		wip = new FiberNode(current.tag, pendingProps, current.key);
@@ -82,7 +100,7 @@ export const createWorkInProgress = (
 	} else {
 		//update
 		wip.pendingProps = current.pendingProps;
-		//清楚上一次的副作用
+		//清楚上一次遗留下来的副作用
 		wip.flags = NoFlags;
 		wip.subtreeFlags = NoFlags;
 	}

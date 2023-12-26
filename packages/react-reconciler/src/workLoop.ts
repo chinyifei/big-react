@@ -4,21 +4,25 @@ import { completeWork } from './completeWork';
 import { FiberNode, FiberRootNode, createWorkInProgress } from './fiber';
 import { MutationMask, NoFlags } from './fiberFlags';
 import { HostRoot } from './workTags';
-
+/**全局指针指向正在工作的fiberNode */
 let workInprogress: FiberNode | null = null;
-/**根据fiberRootNode生成hostRootFiber,接着生成hostRootFiber对应的workInprogress */
+/**
+ * 初始化,使全局指针wip指向第一个FiberNode,
+ * 根据fiberRootNode生成hostRootFiber,接着生成hostRootFiber对应的workInprogress */
 function prepareFreshStack(root: FiberRootNode) {
+	//FiberRootNode不能作为workInprogress,使用createWorkInProgress,生成FiberRootNode的workInProgress
 	workInprogress = createWorkInProgress(root.current, {});
 }
 
-//连接rendeRoot和updateQueue
-export function scheduleUpdateOnFiber(fiber: FiberNode) {
+/**
+ *updateContainer连接rendeRoot更新流程
+ * */ export function scheduleUpdateOnFiber(fiber: FiberNode) {
 	// TODO 调度功能
 	//fiber root node
 	const root = markUpdateFromFiberToRoot(fiber);
 	renderRoot(root);
 }
-/**从当前更新的fiber一直遍历到fiberRootNode */
+/**从当前更新的fiberNode一直遍历到fiberRootNode */
 function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	let node = fiber;
 	let parent = fiber.return;
@@ -31,7 +35,7 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	}
 	return null;
 }
-
+/**更新流程 */
 function renderRoot(root: FiberRootNode) {
 	//init初始化
 	prepareFreshStack(root);
@@ -90,18 +94,25 @@ function workLoop() {
 		PerformUnitOfWork(workInprogress);
 	}
 }
-
+/**jsx的消费顺序
+ * 以DFS（深度优先遍历）的顺序遍历ReactElement，这意味着：
+● 如果有子节点，遍历子节点
+● 如果没有子节点，遍历兄弟节点
+ */
 const PerformUnitOfWork = (fiber: FiberNode) => {
 	const next = beginWork(fiber);
+	/**这里赋值memoizedProps,保存工作之后的props */
 	fiber.memoizedProps = fiber.pendingProps;
+	/**如果没有子节点,遍历兄弟节点 */
 	if (next === null) {
-		/**如果没有子节点,遍历兄弟节点 */
+		/**归 */
 		completeUnitOfWork(fiber);
 	} else {
+		/**如果没有到底，继续执行workLoop(),继续PerformUnitOfWork()遍历 */
 		workInprogress = next as any;
 	}
 };
-
+/**如果没有子节点,遍历兄弟节点 */
 const completeUnitOfWork = (fiber: FiberNode) => {
 	let node: FiberNode | null = fiber;
 	do {

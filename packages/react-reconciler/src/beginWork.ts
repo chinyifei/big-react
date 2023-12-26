@@ -7,9 +7,9 @@ import { HostComponent, HostRoot, HostText } from './workTags';
 import { mountChildFibers, reconcileChildFibers } from './childrenFibers';
 
 /**
- * beginWork中标记的都是与结构相关的flags:placment/childrenDeletion
+ * React element 与 FiberNode 比较,生成返回子FiberNode
+ * tips:beginWork中标记的都是与结构相关的flags:placment/childrenDeletion
  * 不包含属性变化的flags:update
- *
  */
 export const beginWork = (wip: FiberNode) => {
 	// 比较,然后返回子fiberNode

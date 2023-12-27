@@ -14,7 +14,7 @@ export const createInstance = (type: string, props?: any): Instance => {
 export const createTextInstance = (context: string) => {
 	return document.createTextNode(context);
 };
-
+/**parent.appendChild(child); */
 export const appendInitialChild = (
 	parent: Instance | Container,
 	child: Instance

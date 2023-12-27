@@ -30,6 +30,7 @@ export class FiberNode {
 	alternate: FiberNode | null;
 	/**副作用标记 例如placement,deletion,update */
 	flags: Flags;
+	/**子树中的副作用 */
 	subtreeFlags: Flags;
 	/**保存UpdateQueue的数据结构
  * {
@@ -112,7 +113,7 @@ export const createWorkInProgress = (
 	wip.memoizedState = current.memoizedState;
 	return wip;
 };
-
+/**根据ReactElementType创建FiberNode */
 export function createFiberFromElement(element: ReactElementType): FiberNode {
 	const { props, key, type } = element;
 	let fiberTag: WorkTag = FunctionComponent;

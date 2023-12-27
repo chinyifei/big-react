@@ -120,9 +120,10 @@ const completeUnitOfWork = (fiber: FiberNode) => {
 		const sibling = node.sibling;
 		if (sibling !== null) {
 			workInprogress = sibling;
-			//归
+			//归 -->workLoop
 			return;
 		}
+		/**所以completeWork归的时候,node总是最靠上的节点 */
 		node = node.return;
 		workInprogress = node;
 	} while (node !== null);

@@ -3,6 +3,7 @@ import { FiberNode, FiberRootNode } from './fiber';
 import { MutationMask, NoFlags, Placement } from './fiberFlags';
 import { HostComponent, HostRoot, HostText } from './workTags';
 let nextEffect: FiberNode | null = null;
+/**找到具体副作用的fiberNode */
 export function commitMutationEffects(finishedWork: FiberNode) {
 	nextEffect = finishedWork;
 	while (nextEffect !== null) {
@@ -14,8 +15,8 @@ export function commitMutationEffects(finishedWork: FiberNode) {
 		) {
 			nextEffect = child;
 		} else {
-			/**不包含subtreeFlags,有可能包含Flags,
-			 * 或者找到底了
+			/**不包含subtreeFlags,有可能包含Flags,执行副作用commitMutationEffectOnFiber
+			 * 或者找到底了,向上遍历
 			 */
 			//向上遍历 DFS
 			up: while (nextEffect !== null) {
@@ -30,7 +31,7 @@ export function commitMutationEffects(finishedWork: FiberNode) {
 		}
 	}
 }
-
+/**处理拥有flags节点的副作用 */
 function commitMutationEffectOnFiber(finishedWork: FiberNode) {
 	const flags = finishedWork.flags;
 	if ((flags & Placement) !== NoFlags) {
@@ -42,7 +43,7 @@ function commitMutationEffectOnFiber(finishedWork: FiberNode) {
 		// flags ChildDeletion
 	}
 }
-
+/**执行Placement副作用 */
 function commitPlacement(finishedWork: FiberNode) {
 	if (__DEV__) {
 		console.warn('执行Placement操作', finishedWork);
@@ -72,7 +73,7 @@ function getHostParent(fiber: FiberNode): Container | null {
 	}
 	return null;
 }
-
+/** 将Placement对应的node插入到宿主环境*/
 function appendPlacementNodeIntoContainer(
 	finishedWork: FiberNode,
 	hostParent: Container

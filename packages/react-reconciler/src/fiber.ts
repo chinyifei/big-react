@@ -24,7 +24,11 @@ export class FiberNode {
 	pendingProps: Props;
 	/**工作完成之后的props */
 	memoizedProps: Props | null;
-	/**保存上一次工作的state(暂定jsx 或者是返回jsx的函数) */
+	/**保存上一次工作的state(暂定jsx 或者是返回jsx的函数)
+	 * 对于不同类型的fiberNode,保存不同的状态,比如
+	 * FunctionComponent:hook的链表,
+	 * HostComponent:dom
+	 */
 	memoizedState: any;
 	/**指向该FiberNode在另一次更新时对应的FiberNode  */
 	alternate: FiberNode | null;

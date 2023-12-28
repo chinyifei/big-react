@@ -3,8 +3,14 @@
 import { ReactElementType } from 'shared/ReactTypes';
 import { FiberNode } from './fiber';
 import { UpdateQueue, processUpdateQueue } from './updateQueue';
-import { HostComponent, HostRoot, HostText } from './workTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText,
+} from './workTags';
 import { mountChildFibers, reconcileChildFibers } from './childrenFibers';
+import { renderWithHooks } from './fiberHooks';
 
 /**
  * 通过对比子React element 与 子FiberNode 比较,生成返回子对应的wip的FiberNode
@@ -19,6 +25,8 @@ export const beginWork = (wip: FiberNode) => {
 		case HostComponent:
 			return updateHostComponent(wip);
 		/**HostText没有子节点,没有beginWork工作流程 返回null,归 */
+		case FunctionComponent:
+			return updateFunctionComponent(wip);
 		case HostText:
 			return null;
 		default:
@@ -57,6 +65,12 @@ function updateHostRoot(wip: FiberNode) {
 function updateHostComponent(wip: FiberNode) {
 	const nextProps = wip.pendingProps;
 	const nextChildren = nextProps.children;
+	reconcileChildren(wip, nextChildren);
+	return wip.child;
+}
+
+function updateFunctionComponent(wip: FiberNode) {
+	const nextChildren = renderWithHooks(wip);
 	reconcileChildren(wip, nextChildren);
 	return wip.child;
 }

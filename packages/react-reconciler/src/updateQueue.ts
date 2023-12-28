@@ -1,20 +1,21 @@
 /**触发更新的机制 */
 import { Action } from 'shared/ReactTypes';
-
-export interface Update<state> {
-	action: Action<state>;
+import { Dispatch } from 'react/src/currentDispatcher';
+export interface Update<State> {
+	action: Action<State>;
 }
 
-export type UpdateQueue<state> = {
+export type UpdateQueue<State> = {
 	shared: {
-		pending: Update<state> | null;
+		pending: Update<State> | null;
 	};
+	dispatch: Dispatch<State> | null;
 };
 /**创建数据结构update
  * {
 		action,
 	} */
-export const createUpdate = <state>(action: Action<state>): Update<state> => {
+export const createUpdate = <State>(action: Action<State>): Update<State> => {
 	return {
 		action,
 	};
@@ -31,6 +32,7 @@ export const createUpdateQueue = <State>(): UpdateQueue<State> => {
 		shared: {
 			pending: null,
 		},
+		dispatch: null,
 	} as UpdateQueue<State>;
 };
 /**Update插入UpdateQueue中
